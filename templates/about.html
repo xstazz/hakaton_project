@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>О НАС</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_about.css') }}">
+</head>
+<body>
+    <section>
+        <div class="heading1">
+            <h2>О НАС</h2>
+        </div>
+        <div class="left_num">
+            <h3>01</h3>
+        </div>
+        <div class="right_num">
+            <h3>01</h3>
+        </div>
+
+        <div class="center-text">
+            <p>В настоящее время в России нет организованого пешего туризма в формате «трекинга». Трекинг это поход по заранее проложенным и обустроеным маршрутам в течении нескольких дней (обычно 2-3 дня).<br>
+            <br>Подобное направление туризма является популярной мировой практикой, однако у нас в стране в настоящий момент системно не развивается.
+            Весь пеший туризм является неконтроллируемым и не всегда безопасным.</p>
+        </div>
+        <button id="goBackButton">
+            <img src="{{ url_for('static', filename='img/backButton.png') }}" alt="Back">
+        </button>
+    </section>
+    <script src="{{ url_for('static', filename='backButton.js') }}"></script>
+</body>
+</html>

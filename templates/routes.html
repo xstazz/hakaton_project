@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>МАРШРУТЫ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_routes.css') }}">
+</head>
+<body>
+    <section>
+        <div class="heading1">
+            <h2>МАРШРУТЫ</h2>
+        </div>
+        <div class="left_num">
+            <h3>02</h3>
+        </div>
+        <div class="right_num">
+            <h3>02</h3>
+        </div>
+
+        <button id="goBackButton">
+            <img src="{{ url_for('static', filename='img/backButton.png') }}" alt="Back">
+        </button>
+
+    </section>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+    <script src="{{ url_for('static', filename='backButton.js') }}"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=40d1649f-0493-4b70-98ba-98533de7710b" type="text/javascript"></script>
+    <script type="text/javascript">
+        ymaps.ready(init);
+
+        function init() {
+            var map = new ymaps.Map('map', {
+                center: [55.751574, 37.573856],
+                zoom: 9
+            });
+
+            var point1 = new ymaps.GeoObject({
+                geometry: {
+                    type: "Point",
+                    coordinates: [55.770471, 37.622199]
+                }
+            });
+
+            var point2 = new ymaps.GeoObject({
+                geometry: {
+                    type: "Point",
+                    coordinates: [54.629393, 39.741253]
+                }
+            });
+
+    <!--        map.geoObjects.add(point1);-->
+    <!--        map.geoObjects.add(point2);-->
+
+            var multiRoute = new ymaps.multiRouter.MultiRoute({
+                referencePoints: [point1.geometry.getCoordinates(), point2.geometry.getCoordinates()],
+                params: {
+                    routingMode: 'auto'
+                }
+            }, {
+                wayStationsContentLayout: ymaps.templateLayoutFactory.createClass('<div class="way-station-content">$[properties.name]</div>'),
+                routeActiveStrokeColor: '#0000FF',
+                routeActiveStrokeWidth: 3
+            });
+
+            map.geoObjects.add(multiRoute);
+
+            multiRoute.model.events.add('requestsuccess', function() {
+                var distance = multiRoute.getDistance();
+                var distanceText = distance.text;
+                var distanceValue = distance.value;
+
+                // Display the distance on the map.
+                multiRoute.options.set('routeActiveStrokeColor', '#0000FF');
+                multiRoute.options.set('routeActiveStrokeWidth', 3);
+                multiRoute.options.set('wayStationsContentLayout', ymaps.templateLayoutFactory.createClass('<div class="way-station-content">$[properties.name]</div>'));
+
+                multiRoute.properties.set('balloonContent', 'Distance: ' + distanceText);
+            });
+        }
+    </script>
+</body>
+</html>

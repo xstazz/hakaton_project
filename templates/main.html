@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Русский Трекинг</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_main.css') }}">
+</head>
+<body>
+    <section>
+        <div class="menu">
+            <ul class="navigation">
+                <li><a href="{{ url_for('about') }}">О НАС</a></li>
+                <li><a href="{{ url_for('routes') }}">МАРШРУТЫ</a></li>
+                <li><a href="{{ url_for('vote') }}">ГОЛОСОВАНИЕ</a></li>
+            </ul>
+        </div>
+
+        <form action="{{ url_for('login_post') }}" method="GET">
+            <button type="submit" class="top-right">
+                <img src="{{ url_for('static', filename='img/Button_regist.png') }}" alt="Кнопка с изображением" class="small-img">
+            </button>
+        </form>
+
+        <button type="submit" class="top-left">
+            <img src="{{ url_for('static', filename='img/button_f.png') }}" alt="Кнопка с изображением" class="small-img">
+        </button>
+        <div class="box">
+            <img src="{{ url_for('static', filename='img/bg.png') }}" alt="Your Image" class="top-fixed">
+        </div>
+        <div class="circle"></div>
+    </section>
+    <script src="{{ url_for('static', filename='blur.js') }}"></script>
+</body>
+</html>

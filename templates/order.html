@@ -2,51 +2,7 @@
 <html>
 <head>
     <title>Ваш заказ</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f2f2f2;
-        }
-        h1 {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            margin: 0;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background-color: #fff;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-        p {
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        a {
-            text-decoration: none;
-            color: #333;
-            margin-left: 10px;
-            font-weight: bold;
-            display: inline-block;
-            padding: 5px 10px;
-            border: 1px solid #333;
-            background-color: #fff;
-            border-radius: 5px;
-        }
-        a:hover {
-            background-color: #333;
-            color: #fff;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_order.css') }}">
 </head>
 <body>
     <h1>Ваши голоса:</h1>
@@ -56,8 +12,14 @@
         {% endfor %}
     </ul>
     <p>Итого: {{ total_price }}</p>
-    <a href="{{ url_for('clear_order') }}">Очистить голоса</a>
-    <a href="{{ url_for('pay_order') }}">Подтвердить голоса</a>
-    <a href="{{ url_for('marsh') }}">Вернуться на главную</a>
+    <a href="{{ url_for('clear_order') }}">
+        <img src="{{ url_for('static', filename='img/trash.png') }}" alt="Очистить голоса", class="clear">
+    </a>
+    <a href="{{ url_for('pay_order') }}">
+        <img src="{{ url_for('static', filename='img/point.png') }}" alt="Очистить голоса">
+    </a>
+    <a href="{{ url_for('marsh') }}">
+        <img src="{{ url_for('static', filename='img/backButton.png') }}" alt="Очистить голоса">
+    </a>
 </body>
 </html>
