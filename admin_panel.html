@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ Панель</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<header class="bg-dark text-white text-center py-4">
+    <h1>Активные Голоса</h1>
+</header>
+<main class="container mt-4">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tr class="bg-info text-white">
+                <td><strong>Итог гололсов</strong></td>
+                <td><strong>{{ total_amount }}</strong></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <!-- Отображение графика -->
+        <div id="plotly-chart"></div>
+    </div>
+    <div class="text-center mt-4">
+        <form action="{{ url_for('clear_orders') }}" method="POST">
+            <button type="submit" class="btn btn-danger" action="{{ url_for('admin_panel') }}" onclick="return confirm('Вы уверены, что хотите очистить голоса?')">Отчистить</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn btn-danger">Выйти из аккаунта</a>
+    </div>
+</main>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Подключение библиотеки Plotly -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    // Получаем данные графика из JSON-строки, переданной из Flask
+    var plot_data = {{ plot_json | safe }};
+
+    // Отображаем график
+    Plotly.newPlot('plotly-chart', plot_data);
+</script>
+</body>
+</html>

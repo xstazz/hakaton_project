@@ -1,7 +1,12 @@
+import json
 import os
 import sqlite3
+
+import plotly
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from collections import defaultdict
+import plotly.graph_objs as go
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -9,11 +14,12 @@ mash_list = [
     {"id": 1, "name": "Москва - Сочи", "price": 10},
     {"id": 2, "name": "Рязань - Тагил", "price": 8},
 ]
-users_order = {}
+users_order = []
 order = []
 
 admin_username = 'admin'
 admin_password = 'qwerty'
+
 conn = sqlite3.connect('users.db')
 cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS users (
@@ -21,7 +27,6 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users (
                   username TEXT UNIQUE NOT NULL,
                   email TEXT UNIQUE NOT NULL,
                   password TEXT NOT NULL)''')
-
 conn.commit()
 conn.close()
 
@@ -63,16 +68,12 @@ def login_post():
         cursor = conn.cursor()
         cursor.execute("SELECT username, password FROM users WHERE username = ?", (username,))
         user = cursor.fetchone()
-
         conn.close()
-
         if user and user[1] == password:
             session['username'] = username
             flash(f"Добро пожаловать, {username}!", 'success')
             return redirect(url_for('marsh'))
-
         flash("Неверное имя пользователя или пароль. Пожалуйста, попробуйте снова.", 'error')
-
     return render_template('login.html')
 
 
@@ -90,13 +91,10 @@ def register():
             cursor = conn.cursor()
             cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
                            (username, email, password))
-
             conn.commit()
             conn.close()
-
             flash(f"Регистрация успешна для пользователя: {username}", 'success')
             return redirect(url_for('marsh'))
-
     return render_template('register.html')
 
 
@@ -105,20 +103,26 @@ def admin_panel():
     if 'username' in session and session['username'] == admin_username:
         conn = sqlite3.connect('orders.db')
         cursor = conn.cursor()
-
         cursor.execute("SELECT * FROM orders")
         orders = cursor.fetchall()
-
         vote_counts = defaultdict(int)
         for order in orders:
             vote_counts[order[2]] += 1
 
-        total_amount = "Колличество голосов за туры:\n"
-        for tour, count in vote_counts.items():
-            total_amount += f"Тур {tour}: {count} голоса\n"
+        # Создаем данные для голосов для построения графика
+        labels = list(vote_counts.keys())
+        values = list(vote_counts.values())
 
-        print(total_amount)
-        return render_template('admin_panel.html', data=orders, total_amount=total_amount)
+        # Создаем объект графика Plotly
+        bar_chart = go.Bar(x=labels, y=values)
+
+        # Создаем объект данных графика
+        plot_data = [bar_chart]
+
+        # Преобразуем объект данных графика в JSON для передачи в HTML
+        plot_json = json.dumps(plot_data, cls=plotly.utils.PlotlyJSONEncoder)
+
+        return render_template('admin_panel.html', data=orders, plot_json=plot_json)
     else:
         flash("Доступ к админ панели запрещен.", 'error')
         return redirect(url_for('index'))
@@ -172,7 +176,7 @@ def pay_order():
                 INSERT INTO orders (mash_id, mash_name, mash_price)
                 VALUES (?, ?, ?)
             ''', (mash['id'], mash['name'], mash['price']))
-        users_order[mash['id']] = {'name': mash['name'], 'price': mash['price']}
+        users_order.append({'name': mash['name'], 'price': mash['price']})
     conn.commit()
     conn.close()
     order.clear()
@@ -183,7 +187,7 @@ def pay_order():
 def clear_order():
     global users_order
     for mash in order:
-        users_order[mash['id']] = {'name': mash['name'], 'price': mash['price']}
+        users_order.append({'name': mash['name'], 'price': mash['price']})
     order.clear()
     return redirect(url_for('marsh'))
 
