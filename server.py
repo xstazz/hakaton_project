@@ -6,27 +6,15 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-menu_list = [
-    {"id": 1, "name": "Пицца", "price": 10},
-    {"id": 2, "name": "Паста", "price": 8},
-    {"id": 3, "name": "Салат", "price": 5},
-    {"id": 4, "name": "Паста Карбонара", "price": 5.2},
-    {"id": 5, "name": "Круасан с шоколадом", "price": 2},
-    {"id": 6, "name": "Шашлык", "price": 7},
-    {"id": 7, "name": "Кофе", "price": 1.5},
-    {"id": 8, "name": "Чай", "price": 1.5},
-    {"id": 9, "name": "Сок апельсиновый", "price": 2},
-    {"id": 10, "name": "Шокобон", "price": 150},
+mash_list = [
+    {"id": 1, "name": "Москва - Сочи", "price": 10},
+    {"id": 2, "name": "Рязань - Тагил", "price": 8},
 ]
 users_order = {}
 order = []
 
 admin_username = 'admin'
 admin_password = 'qwerty'
-
-chef_username = 'chef'
-chef_password = 'qwerty'
-
 conn = sqlite3.connect('users.db')
 cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS users (
@@ -63,20 +51,6 @@ def upload_avatar():
         return redirect(url_for('index'))
 
 
-@app.route('/send_to_active_orders', methods=['POST'])
-def send_to_active_orders():
-    global users_order
-    conn = sqlite3.connect('orders.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT dish_name, dish_price FROM orders")
-    orders = cursor.fetchall()
-    for order in orders:
-        users_order[order[0]] = order[1]
-    conn.close()
-    flash("Заказы успешно переданы в активные заказы!", 'success')
-    return redirect(url_for('admin_panel'))
-
-
 @app.route('/login', methods=['POST', 'GET'])
 def login_post():
     if request.method == 'POST':
@@ -86,10 +60,6 @@ def login_post():
             session['username'] = username
             flash(f"Добро пожаловать, {username}!", 'success')
             return redirect(url_for('admin_panel'))
-        elif username == chef_username and password == chef_password:
-            session['username'] = username
-            flash(f"Добро пожаловать, {username}!", 'success')
-            return redirect(url_for('chief'))
         conn = sqlite3.connect('users.db')
         cursor = conn.cursor()
         cursor.execute("SELECT username, password FROM users WHERE username = ?", (username,))
@@ -100,7 +70,7 @@ def login_post():
         if user and user[1] == password:
             session['username'] = username
             flash(f"Добро пожаловать, {username}!", 'success')
-            return redirect(url_for('menu'))
+            return redirect(url_for('marsh'))
 
         flash("Неверное имя пользователя или пароль. Пожалуйста, попробуйте снова.", 'error')
 
@@ -126,7 +96,7 @@ def register():
             conn.close()
 
             flash(f"Регистрация успешна для пользователя: {username}", 'success')
-            return redirect(url_for('menu'))
+            return redirect(url_for('marsh'))
 
     return render_template('register.html')
 
@@ -164,26 +134,26 @@ def clear_orders():
         return redirect(url_for('index'))
 
 
-@app.route('/menu')
-def menu():
+@app.route('/marsh')
+def marsh():
     if 'username' in session:
-        return render_template('menu.html', menu=menu_list)
+        return render_template('marsh.html', mash_list=mash_list)
     else:
         flash("Пожалуйста, войдите в систему, чтобы получить доступ к меню.", 'error')
         return redirect(url_for('index'))
 
 
-@app.route('/add_to_order/<int:menu_id>')
-def add_to_order(menu_id):
-    selected_dish = next((dish for dish in menu_list if dish["id"] == menu_id), None)
-    if selected_dish:
-        order.append(selected_dish)
-    return redirect(url_for('menu'))
+@app.route('/add_to_order/<int:mash_id>')
+def add_to_order(mash_id):
+    selected_mash = next((mash for mash in mash_list if mash["id"] == mash_id), None)
+    if selected_mash:
+        order.append(selected_mash)
+    return redirect(url_for('marsh'))
 
 
 @app.route('/view_order')
 def view_order():
-    total_price = sum(dish['price'] for dish in order)
+    total_price = sum(mash['price'] for mash in order)
     return render_template('order.html', order=order, total_price=total_price)
 
 
@@ -192,25 +162,25 @@ def pay_order():
     global users_order
     conn = sqlite3.connect('orders.db')
     cursor = conn.cursor()
-    for dish in order:
+    for mash in order:
         cursor.execute('''
-                INSERT INTO orders (dish_id, dish_name, dish_price)
+                INSERT INTO orders (mash_id, mash_name, mash_price)
                 VALUES (?, ?, ?)
-            ''', (dish['id'], dish['name'], dish['price']))
-        users_order[dish['id']] = {'name': dish['name'], 'price': dish['price']}
+            ''', (mash['id'], mash['name'], mash['price']))
+        users_order[mash['id']] = {'name': mash['name'], 'price': mash['price']}
     conn.commit()
     conn.close()
     order.clear()
-    return redirect(url_for('menu'))
+    return redirect(url_for('marsh'))
 
 
 @app.route('/clear_order')
 def clear_order():
     global users_order
-    for dish in order:
-        users_order[dish['id']] = {'name': dish['name'], 'price': dish['price']}
+    for mash in order:
+        users_order[mash['id']] = {'name': mash['name'], 'price': mash['price']}
     order.clear()
-    return redirect(url_for('menu'))
+    return redirect(url_for('marsh'))
 
 
 @app.route('/profile')
@@ -234,23 +204,15 @@ def profile():
         return redirect(url_for('index'))
 
 
-def generate_menu_from_prompt(prompt):
-    response = g4f.ChatCompletion.create(
-        model=g4f.models.blackbox,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response
-
-
 if __name__ == '__main__':
     conn = sqlite3.connect('orders.db')
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            dish_id INTEGER,
-            dish_name TEXT,
-            dish_price INTEGER
+            mash_id INTEGER,
+            mash_name TEXT,
+            mash_price INTEGER
         )
     ''')
     conn.commit()
