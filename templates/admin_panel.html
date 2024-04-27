@@ -8,34 +8,21 @@
 </head>
 <body>
 <header class="bg-dark text-white text-center py-4">
-    <h1>Активные заказы</h1>
+    <h1>Активные Голоса</h1>
 </header>
 <main class="container mt-4">
     <div class="table-responsive">
         <table class="table table-striped">
-            <thead class="bg-dark text-white">
-            <tr>
-                <th>Заказ</th>
-                <th>Сумма</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for row in data %}
-            <tr>
-                <td>{{ row[2] }}</td>
-                <td>{{ row[3] }}$</td>
-            </tr>
-            {% endfor %}
+            
             <tr class="bg-info text-white">
-                <td><strong>Итоговая сумма</strong></td>
-                <td><strong>{{ total_amount }}$</strong></td>
+                <td><strong>Итог гололсов</strong></td>
+                <td><strong>{{ total_amount }}</strong></td>
             </tr>
-            </tbody>
         </table>
     </div>
     <div class="text-center mt-4">
         <form action="{{ url_for('clear_orders') }}" method="POST">
-            <button type="submit" class="btn btn-danger" action="{{ url_for('admin_panel') }}" onclick="return confirm('Вы уверены, что хотите очистить заказы?')">Очистить заказы</button>
+            <button type="submit" class="btn btn-danger" action="{{ url_for('admin_panel') }}" onclick="return confirm('Вы уверены, что хотите очистить голоса?')">Отчистить</button>
         </form>
         <a href="{{ url_for('index') }}" class="btn btn-danger">Выйти из аккаунта</a>
     </div>
