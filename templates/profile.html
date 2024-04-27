@@ -44,7 +44,7 @@
         .upload-form label:hover {
             background-color: #0056b3;
         }
-        .upload-button, .menu-button, .logout-button {
+        .payment-button, .menu-button, .logout-button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -54,7 +54,7 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        .upload-button:hover, .menu-button:hover, .logout-button:hover {
+        .payment-button:hover, .menu-button:hover, .logout-button:hover {
             background-color: #0056b3;
         }
     </style>
@@ -70,10 +70,12 @@
         </form>
         <p><strong>Имя пользователя:</strong> {{ username }}</p>
         <p><strong>Адрес электронной почты:</strong> {{ email }}</p>
+        <p><strong>кол - во голосов:</strong> {{ balance }}</p>
+        <button class="payment-button">Пополнить баланс</button>
     </div>
 
     <div class="button-container">
-        <a href="/menu" class="menu-button">Вернуться к меню</a>
+        <a href="/marsh" class="menu-button">Вернуться к меню</a>
         <a href="/login" class="logout-button">Выход из аккаунта</a>
     </div>
 </body>

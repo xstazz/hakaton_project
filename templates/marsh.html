@@ -60,12 +60,12 @@
     <ul>
         {% for mash in mash_list %}
             <li>
-                <span>{{ mash.name }} - {{ mash.price }}$</span>
-                <a href="{{ url_for('add_to_order', mash_id=mash.id) }}">Добавить в заказ</a>
+                <span>{{ mash.name }} - {{ mash.voice }}</span>
+                <a href="{{ url_for('add_to_order', mash_id=mash.id) }}">проголосовать</a>
             </li>
         {% endfor %}
     </ul>
-    <h2>Ваш заказ:</h2>
-    <a href="{{ url_for('view_order') }}">Посмотреть заказ</a>
+    <h2>Подтверждение голоса:</h2>
+    <a href="{{ url_for('view_order') }}">Посмотреть голоса</a>
 </body>
 </html>

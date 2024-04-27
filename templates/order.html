@@ -49,15 +49,15 @@
     </style>
 </head>
 <body>
-    <h1>Ваш заказ:</h1>
+    <h1>Ваши голоса:</h1>
     <ul>
         {% for mash in order %}
-            <li>{{ mash.id }}{{ mash.name }} - {{ mash.price }}$</li>
+            <li>{{ mash.name }} - {{ mash.voice }}</li>
         {% endfor %}
     </ul>
-    <p>Итого: {{ total_price }}$</p>
-    <a href="{{ url_for('clear_order') }}">Очистить заказ</a>
-    <a href="{{ url_for('pay_order') }}">Оплатить</a>
+    <p>Итого: {{ total_price }}</p>
+    <a href="{{ url_for('clear_order') }}">Очистить голоса</a>
+    <a href="{{ url_for('pay_order') }}">Подтвердить голоса</a>
     <a href="{{ url_for('marsh') }}">Вернуться на главную</a>
 </body>
 </html>
