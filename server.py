@@ -1,18 +1,19 @@
 import json
 import os
 import sqlite3
-
 import plotly
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from collections import defaultdict
 import plotly.graph_objs as go
+from cloudipsp import Api, Checkout
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 mash_list = [
-    {"id": 1, "name": "Москва - Сочи", "price": 10},
-    {"id": 2, "name": "Рязань - Тагил", "price": 8},
+    {"id": 1, "name": "Москва - Сочи", "voice": 1},
+    {"id": 2, "name": "Рязань - Тагил", "voice": 1},
 ]
 users_order = []
 order = []
@@ -108,18 +109,10 @@ def admin_panel():
         vote_counts = defaultdict(int)
         for order in orders:
             vote_counts[order[2]] += 1
-
-        # Создаем данные для голосов для построения графика
         labels = list(vote_counts.keys())
         values = list(vote_counts.values())
-
-        # Создаем объект графика Plotly
         bar_chart = go.Bar(x=labels, y=values)
-
-        # Создаем объект данных графика
         plot_data = [bar_chart]
-
-        # Преобразуем объект данных графика в JSON для передачи в HTML
         plot_json = json.dumps(plot_data, cls=plotly.utils.PlotlyJSONEncoder)
 
         return render_template('admin_panel.html', data=orders, plot_json=plot_json)
@@ -162,7 +155,7 @@ def add_to_order(mash_id):
 
 @app.route('/view_order')
 def view_order():
-    total_price = sum(mash['price'] for mash in order)
+    total_price = sum(mash['voice'] for mash in order)
     return render_template('order.html', order=order, total_price=total_price)
 
 
@@ -173,10 +166,10 @@ def pay_order():
     cursor = conn.cursor()
     for mash in order:
         cursor.execute('''
-                INSERT INTO orders (mash_id, mash_name, mash_price)
+                INSERT INTO orders (mash_id, mash_name, mash_voice)
                 VALUES (?, ?, ?)
-            ''', (mash['id'], mash['name'], mash['price']))
-        users_order.append({'name': mash['name'], 'price': mash['price']})
+            ''', (mash['id'], mash['name'], mash['voice']))
+        users_order.append({'name': mash['name'], 'price': mash['voice']})
     conn.commit()
     conn.close()
     order.clear()
@@ -221,7 +214,7 @@ if __name__ == '__main__':
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             mash_id INTEGER,
             mash_name TEXT,
-            mash_price INTEGER
+            mash_voice INTEGER
         )
     ''')
     conn.commit()
