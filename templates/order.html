@@ -51,13 +51,13 @@
 <body>
     <h1>Ваш заказ:</h1>
     <ul>
-        {% for dish in order %}
-            <li>{{ dish.name }} - {{ dish.price }}$</li>
+        {% for mash in order %}
+            <li>{{ mash.id }}{{ mash.name }} - {{ mash.price }}$</li>
         {% endfor %}
     </ul>
     <p>Итого: {{ total_price }}$</p>
     <a href="{{ url_for('clear_order') }}">Очистить заказ</a>
     <a href="{{ url_for('pay_order') }}">Оплатить</a>
-    <a href="{{ url_for('menu') }}">Вернуться на главную</a>
+    <a href="{{ url_for('marsh') }}">Вернуться на главную</a>
 </body>
 </html>
