@@ -1,8 +1,7 @@
 import os
 import sqlite3
-import g4f
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from collections import defaultdict
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -110,9 +109,15 @@ def admin_panel():
         cursor.execute("SELECT * FROM orders")
         orders = cursor.fetchall()
 
-        total_amount = sum(order[3] for order in orders)
+        vote_counts = defaultdict(int)
+        for order in orders:
+            vote_counts[order[2]] += 1
 
-        conn.close()
+        total_amount = "Колличество голосов за туры:\n"
+        for tour, count in vote_counts.items():
+            total_amount += f"Тур {tour}: {count} голоса\n"
+
+        print(total_amount)
         return render_template('admin_panel.html', data=orders, total_amount=total_amount)
     else:
         flash("Доступ к админ панели запрещен.", 'error')
