@@ -6,14 +6,15 @@ import plotly
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from collections import defaultdict
 import plotly.graph_objs as go
+from regions import DATA_REGIONS, DATA_REGIONS2
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-mash_list = [
-    {"id": 1, "name": "Москва", "voice": 1},
-    {"id": 2, "name": "Рязань", "voice": 1},
-]
+true_value_received = False
+
+mash_list = DATA_REGIONS
+
 users_order = {}
 order = []
 
@@ -25,7 +26,10 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   username TEXT UNIQUE NOT NULL,
                   email TEXT UNIQUE NOT NULL,
-                  password TEXT NOT NULL)''')
+                  password TEXT NOT NULL,
+                  voices INTEGER DEFAULT 0,
+                  price INTEGER DEFAULT 0
+                  )''')
 
 conn.commit()
 conn.close()
@@ -36,9 +40,52 @@ def index():
     return render_template('main.html')
 
 
+@app.route('/geo_admin')
+def geo_admin():
+    return render_template('geo_admin.html')
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/return_true', methods=['POST'])
+def return_true():
+    global true_value_received
+    true_value_received = True
+    print(true_value_received)
+    return redirect(url_for('admin_panel'))
+
+
+@app.route('/Rus_diam')
+def Rus_diam():
+    if true_value_received:
+        conn = sqlite3.connect('orders2.db')
+    else:
+        conn = sqlite3.connect('orders.db')
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders")
+    orders = cursor.fetchall()
+    vote_counts = defaultdict(int)
+    for order in orders:
+        vote_counts[order[2]] += 1
+
+    # Create data for votes to build the chart
+    labels = list(vote_counts.keys())
+    values = list(vote_counts.values())
+
+    # Create a Plotly chart object
+    bar_chart = go.Bar(x=labels, y=values)
+
+    # Create chart data object
+    plot_data = [bar_chart]
+
+    # Convert the chart data object to JSON for passing to HTML
+    plot_json = json.dumps(plot_data, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template('Rus_diam.html', data=orders, plot_json=plot_json)
 
 
 @app.route('/routes')
@@ -181,9 +228,13 @@ def clear_orders():
 @app.route('/marsh')
 def marsh():
     if 'username' in session:
+        if true_value_received:
+            mash_list = DATA_REGIONS2
+        else:
+            mash_list = DATA_REGIONS
         return render_template('marsh.html', mash_list=mash_list)
     else:
-        flash("Пожалуйста, войдите в систему, чтобы получить доступ к меню.", 'error')
+        flash("Please log in to access the menu.", 'error')
         return redirect(url_for('index'))
 
 
@@ -198,7 +249,36 @@ def add_to_order(mash_id):
 @app.route('/view_order')
 def view_order():
     total_price = sum(mash['voice'] for mash in order)
-    return render_template('order.html', order=order, total_price=total_price)
+
+    if 'username' in session:
+        username = session['username']
+        conn = sqlite3.connect('users.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT voices FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+
+        if user:
+            current_balance = user[0]
+            new_balance = current_balance - total_price
+
+            if new_balance >= 0:
+                # Update the database with the new balance
+                cursor.execute("UPDATE users SET voices = ? WHERE username = ?", (new_balance, username))
+                conn.commit()
+            else:
+                flash("Недостаточно средств для оплаты заказа.", 'error')
+                conn.close()
+                return redirect(url_for('marsh'))
+
+            conn.close()
+            return render_template('order.html', order=order, total_price=total_price, new_balance=new_balance)
+        else:
+            flash("Не удалось загрузить данные профиля.", 'error')
+            conn.close()
+            return redirect(url_for('index'))
+    else:
+        flash("Пожалуйста, войдите в систему, чтобы получить доступ к профилю.", 'error')
+        return redirect(url_for('index'))
 
 
 @app.route('/pay_order')
@@ -233,13 +313,16 @@ def profile():
         username = session['username']
         conn = sqlite3.connect('users.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT username, email FROM users WHERE username = ?", (username,))
+        cursor.execute("SELECT username, email, voices, price FROM users WHERE username = ?", (username,))
         user = cursor.fetchone()
         conn.close()
+        print(user)
         if user:
             username = user[0]
             email = user[1]
-            return render_template('profile.html', username=username, email=email)
+            balance = user[2]
+            price = user[3]
+            return render_template('profile.html', username=username, email=email, balance=balance, price=price)
         else:
             flash("Не удалось загрузить данные профиля.", 'error')
             return redirect(url_for('index'))
@@ -259,6 +342,19 @@ if __name__ == '__main__':
             mash_voice INTEGER
         )
     ''')
+    conn.commit()
+    conn.close()
+
+    conn = sqlite3.connect('orders2.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+           CREATE TABLE IF NOT EXISTS orders (
+               id INTEGER PRIMARY KEY AUTOINCREMENT,
+               mash_id INTEGER,
+               mash_name TEXT,
+               mash_voice INTEGER
+           )
+       ''')
     conn.commit()
     conn.close()
 

@@ -1,3 +1,6 @@
+import sqlite3
+from collections import defaultdict
+
 DATA_REGIONS = [
     {"id": 1, "name": "Республика Адыгея (Адыгея)", "voice": 1},
     {"id": 2, "name": "Республика Башкортостан", "voice": 1},
@@ -89,3 +92,29 @@ DATA_REGIONS = [
     {"id": 94, "name": "Луганская Народная Республика", "voice": 1},
     {"id": 95, "name": "Херсонская область", "voice": 1}
 ]
+
+conn = sqlite3.connect('orders.db')
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM orders")
+orders = cursor.fetchall()
+vote_counts = defaultdict(int)
+for order in orders:
+    vote_counts[order[2]] += 1
+
+# Сортируем словарь по значениям в убывающем порядке и выбираем только 10 элементов
+sorted_votes = dict(sorted(vote_counts.items(), key=lambda item: item[1], reverse=True)[:10])
+
+sorted_keys = sorted_votes.keys()
+
+# Создаем новый список для совпавших элементов
+global DATA_REGIONS2
+DATA_REGIONS2 = []
+
+# Перебираем элементы из списка DATA_REGIONS
+for region in DATA_REGIONS:
+    # Если название региона присутствует в ключах sorted_votes, добавляем этот элемент в новый список
+    if region["name"] in sorted_keys:
+        DATA_REGIONS2.append(region)
+
+# Выводим новый список
+print(DATA_REGIONS2)

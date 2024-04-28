@@ -1,0 +1,178 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #A1C4D4;
+    background-image: url('img/main_bg.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.top-left,
+.top-right {
+    position: absolute;
+    z-index: 1000;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.top-right {
+    top: 1.5%;
+    right: 2%;
+}
+
+.top-right2 {
+    position: absolute;
+    z-index: 1000;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.top-right2 {
+    top: 1.5%;
+    right: 10%;
+}
+
+h1 {
+    background-color: #fff;
+    color: #242424;
+    padding: 20px;
+    margin: 0;
+    border-radius: 25px;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+.table {
+    margin: 0 auto;
+    font-size: 1.5em;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+.btn {
+    display: block;
+    margin: 0 auto;
+}
+
+#plotly-chart {
+    border-radius: 10px;
+    width: 1000px;
+    height: 500px;
+    margin: 0 auto;
+}
+
+.clear-img {
+    display: block; /* Сделаем изображение блочным элементом */
+    margin: 0 auto; /* Центрируем по горизонтали */
+    width: 75px; /* Задайте нужную ширину */
+    height: auto; /* Поддерживайте соотношение сторон */
+    cursor: pointer; /* Добавьте указатель при наведении */
+}
+
+.hidden-btn {
+    display: block; /* Сделаем кнопку блочным элементом */
+    margin: 0 auto; /* Центрируем по горизонтали */
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+
+.logout-img {
+    width: 75px; /* Задайте нужную ширину */
+    height: auto; /* Поддерживайте соотношение сторон */
+    cursor: pointer; /* Добавьте указатель при наведении */
+    margin-left: 10px;
+}
+
+.hidden-btn {
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #A1C4D4;
+    background-image: url('img/main_bg.png');
+    background-size: cover;
+    background-position: center;
+}
+.profile-info {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+h1 {
+    color: #D9581C;
+}
+p {
+    color: #242424;
+    font-size: 16px;
+}
+img {
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+.upload-form {
+    margin-top: 20px;
+}
+.upload-form input[type="file"] {
+    display: none;
+}
+.upload-form label {
+    background-color: #D9581C;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.upload-form label:hover {
+    background-color: #D9581C;
+}
+.payment-button, .upload-button, .menu-button, .logout-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #D9581C;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.payment-button:hover, .menu-button:hover, .logout-button:hover {
+    background-color: #00000;
+}
+
+.small-img {
+    width: 75%;
+    height: auto;
+    z-index: 1000;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.button-container {
+    margin-top: 20px;
+}

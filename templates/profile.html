@@ -2,62 +2,7 @@
 <html>
 <head>
     <title>Профиль пользователя</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f2f2f2;
-        }
-        .profile-info {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-            font-size: 16px;
-        }
-        img {
-            border-radius: 50%;
-            margin-bottom: 20px;
-        }
-        .upload-form {
-            margin-top: 20px;
-        }
-        .upload-form input[type="file"] {
-            display: none;
-        }
-        .upload-form label {
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .upload-form label:hover {
-            background-color: #0056b3;
-        }
-        .payment-button, .menu-button, .logout-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .payment-button:hover, .menu-button:hover, .logout-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_protfile.css') }}">
 </head>
 <body>
     <h1>Профиль пользователя</h1>
@@ -71,7 +16,11 @@
         <p><strong>Имя пользователя:</strong> {{ username }}</p>
         <p><strong>Адрес электронной почты:</strong> {{ email }}</p>
         <p><strong>кол - во голосов:</strong> {{ balance }}</p>
-        <button class="payment-button">Пополнить баланс</button>
+        <p><strong>общ. пожертвование:</strong> {{ price }} руб.</p>
+        <a href="https://t.me/RussianTravelPayment_bot">
+            <button class="payment-button">Пополнить баланс</button>
+        </a>
+
     </div>
 
     <div class="button-container">

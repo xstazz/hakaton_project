@@ -15,13 +15,20 @@ chat_usernames = {}
 conn = sqlite3.connect('users.db')
 cursor = conn.cursor()
 username, password = '', ''
+
 print('SELECT * FROM users WHERE username=? AND password=?')
 
+conn = sqlite3.connect('users.db')
+cursor = conn.cursor()
 
-async def check_login(username: str, password: str) -> bool:
-    cursor.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password))
+
+async def check_login(username: str, password: str) -> (bool, int):
+    cursor.execute('SELECT id FROM users WHERE username=? AND password=?', (username, password))
     user = cursor.fetchone()
-    return True if user else False
+    if user:
+        return True, user[0]  # Возвращаем True и id пользователя
+    else:
+        return False, None
 
 
 @dp.message_handler(commands=['help'])
@@ -90,11 +97,11 @@ async def cmd_pay(message: Message):
     if len(user_input) != 3 or user_input[0] != '/pay':
         await message.reply("❌ Неверный формат! Используйте: /pay {кол-во голосов} {сумма}")
         return
-
     _, votes, amount = user_input
+
     try:
         votes = int(votes)
-        amount = float(amount)
+        amount = int(amount)
     except ValueError:
         await message.reply('❌ Неверный формат чисел!')
         return
@@ -104,6 +111,18 @@ async def cmd_pay(message: Message):
     if amount < votes * 100:
         await message.reply('❗ Ошибка! Цена одного голоса = 100 рублей!')
         return
+    # Получаем текущее количество голосов пользователя из базы данных
+    cursor.execute('SELECT voices, price FROM users WHERE username = ?', (username,))
+    current_voices = cursor.fetchone()[0]
+    if current_voices + votes <= 95:
+        # Просто добавляем votes в базу данных
+        cursor.execute('UPDATE users SET voices = voices + ? WHERE username = ?', (votes, username))
+        cursor.execute('UPDATE users SET price = price + ? WHERE username = ?', (amount, username))
+    else:
+        await message.reply('❗ Ошибка! Колличество голосов не может привышать 95')
+        return
+
+    conn.commit()
 
     await message.reply(f'✅ Платеж успешно проведен: {votes} голосов за {amount} рублей!')
 

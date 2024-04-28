@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ВСЕРОСС ГОЛОСОВАНИЕ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_vote.css') }}">
+</head>
+<body>
+    <h1>Всероссийское голосование</h1>
+    <div>
+        <div id="plotly-chart"></div>
+    </div>
+
+     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        // Получаем данные графика из JSON-строки, переданной из Flask
+        var plot_data = {{ plot_json | safe }};
+
+        // Отображаем график
+        Plotly.newPlot('plotly-chart', plot_data);
+    </script>
+</body>
+</html>

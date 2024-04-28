@@ -1,0 +1,71 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #A1C4D4;
+    background-image: url('img/main_bg.png');
+    background-size: cover;
+    background-position: center;
+}
+h1 {
+    background-color: #fff;
+    color: #242424;
+    padding: 20px;
+    margin: 0;
+    border-radius: 25px;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    background-color: #fff;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+p {
+    font-weight: bold;
+    margin-top: 20px;
+}
+a {
+    text-decoration: none;
+    color: #333;
+    margin-left: 10px;
+    font-weight: bold;
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #333;
+    background-color: #fff;
+    border-radius: 5px;
+}
+a:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Убираем фон и уменьшаем размер кнопок */
+img {
+    background-color: transparent;
+    border: none; /* Убираем границы */
+    width: 50px; /* Измените размеры по вашему усмотрению */
+    height: 50px; /* Измените размеры по вашему усмотрению */
+    text-decoration: none; /* Убираем подчеркивание */
+}
+
+/* Опционально: добавляем отступ между кнопками */
+a {
+    margin-right: 10px;
+}
+
