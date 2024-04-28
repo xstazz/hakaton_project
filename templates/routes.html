@@ -36,48 +36,19 @@
                 zoom: 9
             });
 
-            var point1 = new ymaps.GeoObject({
-                geometry: {
-                    type: "Point",
-                    coordinates: [55.770471, 37.622199]
-                }
-            });
-
-            var point2 = new ymaps.GeoObject({
-                geometry: {
-                    type: "Point",
-                    coordinates: [54.629393, 39.741253]
-                }
-            });
-
-    <!--        map.geoObjects.add(point1);-->
-    <!--        map.geoObjects.add(point2);-->
-
-            var multiRoute = new ymaps.multiRouter.MultiRoute({
-                referencePoints: [point1.geometry.getCoordinates(), point2.geometry.getCoordinates()],
-                params: {
-                    routingMode: 'auto'
-                }
-            }, {
-                wayStationsContentLayout: ymaps.templateLayoutFactory.createClass('<div class="way-station-content">$[properties.name]</div>'),
-                routeActiveStrokeColor: '#0000FF',
-                routeActiveStrokeWidth: 3
-            });
-
-            map.geoObjects.add(multiRoute);
-
-            multiRoute.model.events.add('requestsuccess', function() {
-                var distance = multiRoute.getDistance();
-                var distanceText = distance.text;
-                var distanceValue = distance.value;
-
-                // Display the distance on the map.
-                multiRoute.options.set('routeActiveStrokeColor', '#0000FF');
-                multiRoute.options.set('routeActiveStrokeWidth', 3);
-                multiRoute.options.set('wayStationsContentLayout', ymaps.templateLayoutFactory.createClass('<div class="way-station-content">$[properties.name]</div>'));
-
-                multiRoute.properties.set('balloonContent', 'Distance: ' + distanceText);
-            });
+            // Сделаем AJAX-запрос для получения координат из файла coords.txt
+            fetch("/get_coordinates")
+                .then(response => response.json())
+                .then(data => {
+                    var points = data.map(coords => new ymaps.GeoObject({
+                        geometry: {
+                            type: "Point",
+                            coordinates: coords
+                        }
+                    }));
+                    map.geoObjects.add(points);
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 </body>

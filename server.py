@@ -3,7 +3,7 @@ import os
 import sqlite3
 
 import plotly
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from collections import defaultdict
 import plotly.graph_objs as go
 from regions import DATA_REGIONS, DATA_REGIONS2
@@ -43,6 +43,17 @@ def index():
 @app.route('/geo_admin')
 def geo_admin():
     return render_template('geo_admin.html')
+
+
+@app.route('/save_coords_as_text', methods=['GET'])
+def save_coords_as_text():
+    coords = request.args.get('coords')
+
+    # Открываем файл для записи и записываем координаты
+    with open('static/coords.txt', 'a') as file:
+        file.write(coords + '\n')
+
+    return 'Coordinates saved successfully!'
 
 
 @app.route('/about')
@@ -91,6 +102,16 @@ def Rus_diam():
 @app.route('/routes')
 def routes():
     return render_template('routes.html')
+
+
+@app.route('/get_coordinates')
+def get_coordinates():
+    try:
+        with open('static/coords.txt', 'r') as file:
+            coordinates = eval(file.read())  # Используем eval для преобразования текста из файла в список координат
+        return jsonify(coordinates)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/vote')

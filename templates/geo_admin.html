@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style_routes.css') }}">
     <style>
         #map {
-            margin-top:10%;
             width: 80%;
             height: 80%;
         }
@@ -17,124 +16,179 @@
             transform: translateX(-50%);
             z-index: 1000;
         }
-        h1 {
-            background-color: #fff;
-            color: #242424;
-            padding: 20px;
-            margin: 0;
-            border-radius: 25px;
-            font-family: 'Montserrat', sans-serif;
-            white-space: nowrap;
-        }
     </style>
 </head>
 <body>
-<header class="Map_tag">
-    <h1>Карта</h1>
-</header>
-<div id="map-container">
-    <div id="map"></div>
-</div>
-<div class="search-container">
-    <input type="text" id="searchInput" placeholder="Введите название города">
-    <button onclick="searchCity()">Найти город</button>
-</div>
+    <section>
+        <div class="heading1">
+            <h2>МАРШРУТЫ</h2>
+        </div>
+        <div class="left_num">
+            <h3>02</h3>
+        </div>
+        <div class="right_num">
+            <h3>02</h3>
+        </div>
 
-<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=40d1649f-0493-4b70-98ba-98533de7710b"
-        type="text/javascript"></script>
-<script type="text/javascript">
-    ymaps.ready(init);
+        <button id="goBackButton">
+            <img src="{{ url_for('static', filename='img/backButton.png') }}" alt="Back">
+        </button>
 
-    var point1, point2, multiRoute, map, routePoints = [];
+    </section>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Введите название города">
+        <button onclick="searchCity()">Найти город</button>
+    </div>
+    <button onclick="saveMapAsImage()">Сохранить как изображение</button>
+    <button id="saveCoordsButton">Сохранить координаты в файл</button> <!-- Добавленная кнопка -->
 
+    <script src="{{ url_for('static', filename='backButton.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script>
+        function saveMapAsImage() {
+            html2canvas(document.querySelector("#map-container")).then(canvas => {
+                var img = canvas.toDataURL("image/png");
+                var link = document.createElement('a');
+                link.href = img;
+                link.download = 'map.png';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                // Sending image data to server
+                sendImageDataToServer(img);
+            });
+        }
 
-    function addRouteFromFirstPointToLast() {
-        var point1Coordinates = routePoints[0];
-        var point2Coordinates = routePoints[routePoints.length - 1];
-        multiRoute.model.setReferencePoints(routePoints);
-    }
-
-    function init() {
-        map = new ymaps.Map('map', {
-            center: [55.751574, 37.573856],
-            zoom: 9
+        document.getElementById('saveCoordsButton').addEventListener('click', function() {
+            saveCoordsAsText();
         });
 
-        point1 = new ymaps.GeoObject({
-            geometry: {
-                type: "Point",
-<!--                    coordinates: [55.770471, 37.622199]-->
-            }
-        });
+        function saveCoordsAsText() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/save_coords_as_text", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Coordinates saved successfully!");
+                    } else {
+                        console.error("Failed to save coordinates:", xhr.status);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
 
-        point2 = new ymaps.GeoObject({
-            geometry: {
-                type: "Point",
-<!--                    coordinates: [54.629393, 39.741253]-->
-            }
-        });
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=40d1649f-0493-4b70-98ba-98533de7710b" type="text/javascript"></script>
+    <script type="text/javascript">
+        ymaps.ready(init);
 
-        multiRoute = new ymaps.multiRouter.MultiRoute({
-            referencePoints: [point1.geometry.getCoordinates(), point2.geometry.getCoordinates()],
-            params: {
-                routingMode: 'auto'
-            }
-        });
+        var point1, point2, multiRoute, map, routePoints = [];
 
-        map.geoObjects.add(multiRoute);
 
-        map.events.add('click', function (e) {
-            var coords = e.get('coords');
-            var marker = new ymaps.Placemark(coords, {
-                hintContent: 'Marker',
-                balloonContent: 'Coordinates: ' + coords
-            }, {
-                preset: 'islands#redIcon'
+        function addRouteFromFirstPointToLast() {
+            var point1Coordinates = routePoints[0];
+            var point2Coordinates = routePoints[routePoints.length - 1];
+            multiRoute.model.setReferencePoints(routePoints);
+        }
+
+        function init() {
+            map = new ymaps.Map('map', {
+                center: [55.751574, 37.573856],
+                zoom: 9
             });
 
-            map.geoObjects.add(marker);
-            routePoints.push(coords);
-            addRouteFromFirstPointToLast();
-
-            // Add a contextmenu event listener to the marker
-            marker.events.add('contextmenu', function (e) {
-                // Remove the marker from the map
-                map.geoObjects.remove(marker);
-                var index = routePoints.indexOf(coords);
-                if (index !== -1) {
-                    routePoints.splice(index, 1);
+            point1 = new ymaps.GeoObject({
+                geometry: {
+                    type: "Point",
                 }
+            });
+
+            point2 = new ymaps.GeoObject({
+                geometry: {
+                    type: "Point",
+                }
+            });
+
+            multiRoute = new ymaps.multiRouter.MultiRoute({
+                referencePoints: [point1.geometry.getCoordinates(), point2.geometry.getCoordinates()],
+                params: {
+                    routingMode: 'auto'
+                }
+            });
+
+            map.geoObjects.add(multiRoute);
+
+            map.events.add('click', function (e) {
+                var coords = e.get('coords');
+                var marker = new ymaps.Placemark(coords, {
+                    hintContent: 'Marker',
+                    balloonContent: 'Coordinates: ' + coords
+                }, {
+                    preset: 'islands#redIcon'
+                });
+
+                map.geoObjects.add(marker);
+                routePoints.push(coords);
                 addRouteFromFirstPointToLast();
+
+                // Add a contextmenu event listener to the marker
+                marker.events.add('contextmenu', function (e) {
+                    // Remove the marker from the map
+                    map.geoObjects.remove(marker);
+                    var index = routePoints.indexOf(coords);
+                    if (index !== -1) {
+                        routePoints.splice(index, 1);
+                    }
+                    addRouteFromFirstPointToLast();
+                });
             });
-        });
-    }
+        }
 
-    function searchCity() {
-        var cityName = document.getElementById('searchInput').value;
-        ymaps.geocode(cityName).then(function (res) {
-            var firstGeoObject = res.geoObjects.get(0);
-            var coords = firstGeoObject.geometry.getCoordinates(); // Corrected method name
-            map.setCenter(coords, 10);
-        });
-    }
-
-    function sendDataToServer(coords) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/receive_coords", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        var jsonData = JSON.stringify({ "coords": coords });
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    console.log("Coordinates sent successfully!");
-                } else {
-                    console.error("Failed to send coordinates:", xhr.status);
+        function searchCity() {
+            var cityName = document.getElementById('searchInput').value;
+            ymaps.geocode(cityName).then(function (res) {
+                var firstGeoObject = res.geoObjects.get(0);
+                var coords = firstGeoObject.geometry.getCoordinates();
+                map.setCenter(coords, 10);
+            });
+        }
+        function sendDataToServer(coords) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/receive_coords", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            var jsonData = JSON.stringify({ "coords": coords });
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Coordinates sent successfully!");
+                    } else {
+                        console.error("Failed to send coordinates:", xhr.status);
+                    }
                 }
-            }
-        };
-        xhr.send(jsonData);
-    }
+            };
+            xhr.send(jsonData);
+        }
+        function saveCoordsAsText() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/save_coords_as_text?coords=" + JSON.stringify(routePoints), true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Coordinates saved successfully!");
+                    } else {
+                        console.error("Failed to save coordinates:", xhr.status);
+                    }
+                }
+            };
+            xhr.send();
+        }
 
-</script>
+
+    </script>
 </body>
 </html>
